@@ -3,36 +3,34 @@ import './App.css';
 import {useEffect, useState} from 'react';
 import img from './imagenes/Nube.png'
 
-
-
 function App() {
+  const [weather, setWeather] = useState({});
+  const [Degrees, setDegrees] = useState(false);
 
-    const [weather, setWeather] = useState({})
-    const [Degrees, setDegrees] = useState(false);
-    const success = position => {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;  
-    
-      axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=fe633c61aab44476648bf9b620645ce4`)
-        .then(res => setWeather(res.data));
-  }
+
   useEffect(() => {
-       navigator.geolocation.getCurrentPosition(success);
-    }, [])
+    navigator.geolocation.getCurrentPosition((position) =>{
+      const lat = position.coords.latitude;
+      const long = position.coords.longitude;
+      axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=fe633c61aab44476648bf9b620645ce4`)
+           .then(res => setWeather(res.data))      
+      }, (error) => {
+        console.error(error);
+      })
+  }, [])
 
-    console.log(weather);
+  console.log(weather);
 
   const changeName = () => {
-     if(!Degrees){
+    if (!Degrees) {
       setDegrees(true);
-     } else{
+    } else {
       setDegrees(false);
-     }
-    
+    }
   };
 
-  const celsius = Math.round(weather.main?.temp)/5;
-  const farenheit = Math.round(weather.main?.temp)*5;
+  const celsius = (weather.main?.temp - 273.15).toFixed(2);
+  const farenheit = ((Math.round(weather.main?.temp) - 273.15) * (9 / 5) + 32).toFixed(2);
 
   return (
     
